@@ -1,6 +1,5 @@
 node_modules
 Lib
-staticfiles
 assets/dist
 app/__pycache__
 backend/__pycache__
