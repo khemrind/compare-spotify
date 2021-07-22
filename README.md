@@ -8,7 +8,7 @@ Django's REST framework is the main connection between client and server.
 
 ## getting started
 
-Make sure you have the following installed: `python`, ``
+Make sure you have the following installed: `python`, `npm`
 ```sh
 cd compare-spotify
 Scripts\activate
