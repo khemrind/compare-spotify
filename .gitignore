@@ -1,3 +1,9 @@
 node_modules
 Lib
-spotify
+staticfiles
+assets/dist
+backend/__pycache__
+Scripts/__pycache__
+Include
+.vscode
+requirements.py
