@@ -14,8 +14,6 @@ module.exports = {
     filename: '[name]-[hash].js'
   },
 
-  devtool: 'inline-source-map',
-
   module: {
     rules: [
       {
