@@ -1,1 +1,1 @@
-web: gunicorn compare-spotify.wsgi
+web: gunicorn backend.wsgi
