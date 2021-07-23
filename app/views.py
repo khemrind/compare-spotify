@@ -11,7 +11,5 @@ def handle(request: HttpRequest):
     data = {
         'text': f"e{received_count}"
     }
-
-    print()
-
+    
     return JsonResponse(data)
