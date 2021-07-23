@@ -1,9 +1,11 @@
 {% load render_bundle from webpack_loader %}
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>project_1104</title>
+    <title>compare-spotify</title>
+    <link rel="shortcut icon" type="image/png" href="{% static 'icon.png' %}"/>
     <!-- Webpack rendered CSS -->
     {% render_bundle 'main' 'css' %}
 </head>
