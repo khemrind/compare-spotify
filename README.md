@@ -12,7 +12,7 @@ Make sure you have the following installed: `python`, `npm` along with their res
 ```sh
 cd compare-spotify
 Scripts\activate
-npm run
+npm run start
 py manage.py collectstatic
 py manage.py runserver
 ```
