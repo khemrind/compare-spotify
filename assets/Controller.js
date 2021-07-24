@@ -10,17 +10,17 @@ import React from 'react';
 // }
 
 /**
- * 
- * @param {string} endpoint 
- * @param {*} data 
- * @param {React.Dispatch<React.SetStateAction<any>>} setstate
- * @returns data from axios response
+ * Axios api data request function helper for react elements.
+ * @param {React.Dispatch<React.SetStateAction<any>>} setstate state variable's set method
+ * @param {string} object response object to use in setstate
+ * @param {string} endpoint API endpoint to use
+ * @param {*} data parameters to send along with request
  */
-export function request(endpoint, setstate, data) {
+export function request(setstate, object, endpoint, data) {
   var payload = null
   axios.get(endpoint, { params: data })
     .then(response => {
-      payload = response.data.text
+      payload = response.data[object]
       setstate(payload)
       console.log(response) // for development only
     }).catch( function (error) {

@@ -16,7 +16,7 @@ function App() {
   const [text, setText] = useState('');
   
   function handleSubmit() {
-    request('/app/', setText, {count: count})
+    request(setText, 'text', '/app/', { count: count })
     count++;
   }
 
