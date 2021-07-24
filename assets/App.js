@@ -7,7 +7,6 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-
 var count = 0
 
 function App() {
@@ -23,11 +22,7 @@ function App() {
 
   return (
     <Container>
-      <div>
-        <Row>
-          <Col><Button onClick={handleSubmit} variant="primary">button {text}</Button></Col>
-        </Row>
-      </div>
+      <Button onClick={handleSubmit} variant="primary">button {text}</Button>
     </Container>
   )
 }
