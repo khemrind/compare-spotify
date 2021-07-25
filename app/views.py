@@ -8,8 +8,8 @@ def index(request: HttpRequest): # single request example
     return JsonResponse(data)
 
 def session(request: HttpRequest):
-    id = tool.session_id(request.headers)
-    data = { 'id': id }
+    id, input = tool.session_id(request.headers)
+    data = { 'id': id,  'input': input}
     # create session object
     return JsonResponse(data)
 

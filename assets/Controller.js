@@ -3,18 +3,18 @@ import React from 'react';
 
 /**
  * Axios api data request function helper for react state elements.
- * @param {React.Dispatch<React.SetStateAction<any>>} setstate state variable's set method
- * @param {string} object response object to use in setstate
  * @param {string} endpoint API endpoint to use
+ * @param {Object.<string, React.Dispatch<React.SetStateAction<any>>>} assignment response object attribute as key, state variable's set method as value
  * @param {*} data parameters to send along with request
  */
-export function request(setstate, object, endpoint, data) {
-  var payload = null
+ export function request(endpoint, assignment, data) {
   axios.get(endpoint, { params: data })
     .then(response => {
-      payload = response.data[object]
-      setstate(payload)
-      console.log(response.data) // for development only
+      var payload = response.data
+      for (let key in assignment) {
+        assignment[key](payload[key])
+      }
+      console.log(payload) // for development only
     }).catch( function (error) {
       if (error.response) { // request made and server responded
         console.log(error.response.data);
