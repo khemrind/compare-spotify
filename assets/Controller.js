@@ -1,16 +1,8 @@
 import axios from 'axios';
 import React from 'react';
 
-// class Controller {
-
-//     constructor(viewname) {
-        
-//     }
-
-// }
-
 /**
- * Axios api data request function helper for react elements.
+ * Axios api data request function helper for react state elements.
  * @param {React.Dispatch<React.SetStateAction<any>>} setstate state variable's set method
  * @param {string} object response object to use in setstate
  * @param {string} endpoint API endpoint to use
@@ -22,7 +14,7 @@ export function request(setstate, object, endpoint, data) {
     .then(response => {
       payload = response.data[object]
       setstate(payload)
-      console.log(response) // for development only
+      console.log(response.data) // for development only
     }).catch( function (error) {
       if (error.response) { // request made and server responded
         console.log(error.response.data);
