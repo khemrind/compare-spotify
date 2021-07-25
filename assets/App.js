@@ -15,14 +15,22 @@ function App() {
   const [visible, setVisible] = useState(true);
   const [sessionid, setSessionID] = useState(null);
   const [text, setText] = useState('');
-  
+  const [mainDepth, setMainDepth] = useState(0);
+  const [fadeDepth, setFadeDepth] = useState(1);
 
   useEffect(() => {
     if (sessionid == null) {
       request(setSessionID, 'id', '/app/session', {})
     }
     if (visible == true) {
-      setTimeout(() => { setVisible(false) }, 1600)
+      setTimeout(() => { 
+        setVisible(false) 
+        setTimeout(() => {
+          setMainDepth(1) // push to front
+          setFadeDepth(0)
+        }, 400)
+      }, 1600)
+      
     }
   });
   
@@ -33,10 +41,10 @@ function App() {
 
   return (
     <Container> 
-      <Fade in={visible} style={{transition:"opacity .35s linear", backgroundColor:"white", width:"100%", height:"100%", zIndex:1, position:"absolute", top:0, left:0, right:0, bottom:0}}>
+      <Fade in={visible} style={{transition:"opacity .35s linear", backgroundColor:"white", width:"100%", height:"100%", zIndex:fadeDepth, position:"absolute", top:0, left:0, right:0, bottom:0}}>
         <p></p>
       </Fade>
-      <Container style={{margin:'30px', zIndex:0, position:"absolute", top:0, left:0}}>
+      <Container style={{margin:'30px', zIndex:mainDepth, position:"absolute", top:0, left:0}}>
         <Row>
           <Col>{sessionid}</Col>
         </Row>
