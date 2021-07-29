@@ -3,7 +3,7 @@ from tekore._client.full import Spotify
 
 client_id = 'd1c0609dade3434197f56752749768b5'
 client_secret = 'e8bdeaf95b63422e8578c0f3847d1583'
-redirect_uri = 'https://compare-spotify.herokuapp.com/app/session' #'http://127.0.0.1:8000/app/session'
+redirect_uri = 'http://127.0.0.1:8000/app/session'
 
 from tekore._auth.refreshing import RefreshingCredentials
 from tekore._auth.util import UserAuth
