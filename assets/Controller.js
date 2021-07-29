@@ -27,3 +27,24 @@ import React from 'react';
       }
   })
 }
+
+/**
+ * Extended setInterval function.
+ * @param {() => void} closure code to be executed
+ * @param {number} waittime the interval
+ * @param {number} limit function expires when code runs this many times
+ * @returns NodeJS.Timer that can be interrupted with clearInterval(self)
+ */
+export function interval(closure, waittime, limit) {
+  var max = limit
+  var interval = setInterval(() => {
+    if (max == 0) {
+      clearInterval()
+    } else {
+      closure()
+    }
+    max -= 1
+  }, waittime)
+  return interval
+
+}

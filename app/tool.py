@@ -1,7 +1,11 @@
-import hashlib
-from django.http.request import HttpHeaders
+import json
+import uuid
+       
+def encode_json(object):
+    return json.dumps(object)
 
-def session_id(headers: HttpHeaders):
+def decode_json(object):
+    return json.loads(object)
 
-    input = str(headers).replace(' ', '')
-    return (hashlib.sha224(input.encode()).hexdigest(), input)
+def produce_uuid():
+    return uuid.uuid4().hex
