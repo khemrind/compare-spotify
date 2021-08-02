@@ -13,4 +13,4 @@ class StoredSession(models.Model):
         return '<StoredSession:' + self.id + '>'
 
    class Meta:
-      db_table = "storedsessions"
+      db_table = "stored_sessions"

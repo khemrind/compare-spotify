@@ -47,7 +47,7 @@ function App() {
 
   useEffect(() => {
     console.log('render')
-    if (authCode != null && waitForCode) {
+    if ((authCode != null && authCode != 'none') && waitForCode != null) {
       clearInterval(waitForCode)
     }
   });
