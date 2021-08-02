@@ -36,9 +36,11 @@ def verify(request: HttpRequest):
         session = Session.load(identifier)
     # session load attempted
     if session != None:
-        response = { 'code': session.data['code'] }
+        try:
+            response = { 'code': session.data['code'] }
+        except:
+            response = { 'code': 'none' }
     else:
-        # needs to be a proper BAD_REQUEST response
         response = { 'code': 'none' } 
     return JsonResponse(response)
     
