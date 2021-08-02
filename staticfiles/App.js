@@ -47,8 +47,10 @@ function App() {
 
   useEffect(() => {
     console.log('render')
+    // logging in
     if ((authCode != null && authCode != 'none') && waitForCode != null) {
       clearInterval(waitForCode)
+      setWaitForCode(null)
     }
   });
 
@@ -63,9 +65,11 @@ function App() {
     if (redirecturl != null) {
       window.open(redirecturl, '_blank')
     }
-    setWaitForCode(interval(() => {
-      request('/app/verify', {'code': setAuthCode}, { id: sessionid })
-    }, 1500, 10))
+    if (waitForCode == null) { // one login at a time
+      setWaitForCode(interval(() => {
+        request('/app/verify', {'code': setAuthCode}, { id: sessionid })
+      }, 1500, 10))
+    }
   }
 
   // - Styling -
