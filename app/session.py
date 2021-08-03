@@ -40,6 +40,8 @@ class Session:
 
     @classmethod
     def load(cls, identifier: str):
+        if identifier == None:
+            return None
         stored: StoredSession = StoredSession.objects.filter(id = identifier).first()
         if stored != None:
             session = Session(loading=True)

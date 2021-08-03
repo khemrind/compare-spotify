@@ -1,4 +1,4 @@
-import app
+from app import auth
 from django.http import JsonResponse
 from django.http import HttpRequest
 from django.shortcuts import render
@@ -43,4 +43,16 @@ def verify(request: HttpRequest):
     else:
         response = { 'code': 'none' } 
     return JsonResponse(response)
-    
+
+def data(request: HttpRequest):
+    response = {}
+    session = Session.load(request.GET.get('id'))
+    if session != None:
+        code = session.data['code']
+        spotify = auth.app_verify()
+        spotify.token = auth.user_verify(code)
+        listening = ''
+        for item in spotify.current_user_top_tracks('long_term', limit=10).items:
+            listening += item.name + '\n'
+        response = { 'listening': listening}
+    return JsonResponse(response)

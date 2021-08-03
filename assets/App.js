@@ -21,6 +21,7 @@ function App() {
   const [mainDepth, setMainDepth] = useState(0);
   const [fadeDepth, setFadeDepth] = useState(1);
   const [authCode, setAuthCode] = useState(null);
+  const [lt_listening, setLt_listening] = useState(null);
   // offsite
   const [waitForCode, setWaitForCode] = useState(null);
   const [redirecturl, setRedirectURL] = useState(null);
@@ -72,6 +73,12 @@ function App() {
     }
   }
 
+  function handleShowListening() {
+    if (authCode != null && authCode != 'none') {
+      request('/app/data', {'listening': setLt_listening}, { id: sessionid })
+    }
+  }
+
   // - Styling -
 
   const fullscreen = {width:"100%", height:"100%", position:"absolute", top:0, left:0, right:0, bottom:0}
@@ -95,6 +102,12 @@ function App() {
         </Row>
         <Row>
           <Col><Button onClick={openVerifyTab} variant="primary">login</Button></Col>
+        </Row>
+        <Row>
+          <Col><Button onClick={handleShowListening} variant="warning">show lt_listening</Button></Col>
+        </Row>
+        <Row>
+          <Col>{lt_listening}</Col>
         </Row>
       </Container>
     </Container>
