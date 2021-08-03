@@ -54,5 +54,5 @@ def data(request: HttpRequest):
         listening = ''
         for item in spotify.current_user_top_tracks('long_term', limit=10).items:
             listening += item.name + '\n'
-        response = { 'listening': listening}
+        response = { 'listening': listening }
     return JsonResponse(response)
