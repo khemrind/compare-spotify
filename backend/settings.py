@@ -86,8 +86,12 @@ WEBPACK_LOADER = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'dfs3qdhql8dp5r',
+        'USER': 'vouhmyhamttcqo',
+        'PASSWORD': '9c3d707d6b73d3365b3b55cb0f56fe234abd3e10683fbba17b55142f1d32371a',
+        'HOST': 'ec2-52-45-179-101.compute-1.amazonaws.com',
+        'PORT':  '5432'
     }
 }
 

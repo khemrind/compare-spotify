@@ -1,53 +1,115 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import Controller from './Controller';
+import { request, interval } from './Controller';
 import ReactDOM from 'react-dom';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Fade from 'react-bootstrap/Fade'
 
 var count = 0
 
 function App() {
 
-  useEffect(() => {});
+  // - Constants -
 
-  const [text, setText] = useState('');
+  // onsite
+  const [visible, setVisible] = useState(true);
+  const [sessionid, setSessionID] = useState(null);
+  const [text, setText] = useState(null);
+  const [mainDepth, setMainDepth] = useState(0);
+  const [fadeDepth, setFadeDepth] = useState(1);
+  const [authCode, setAuthCode] = useState(null);
+  const [lt_listening, setLt_listening] = useState(null);
+  // offsite
+  const [waitForCode, setWaitForCode] = useState(null);
+  const [redirecturl, setRedirectURL] = useState(null);
+
+  // - Initialization -
+
+  useEffect(() => {
+    // session
+    request('/app/session',{ 
+      'id': setSessionID,
+      'url': setRedirectURL,
+    }, {})
+    // fade
+    setTimeout(() => { 
+      setVisible(false) 
+      setTimeout(() => {
+        setMainDepth(1) // push to front
+        setFadeDepth(0)
+      }, 400)
+    }, 1250)
+  }, []); // -> runs once
+
+  // - Rendering -
+
+  useEffect(() => {
+    console.log('render')
+    // logging in
+    if ((authCode != null && authCode != 'none') && waitForCode != null) {
+      clearInterval(waitForCode)
+      setWaitForCode(null)
+    }
+  });
+
+  // - Input Actions -
   
   function handleSubmit() {
-    axios.get('/app/', {
-      params: {
-        count: count
-      }
-    })
-    .then(response => {
-      console.log(response.data)
-      setText(response.data.text)
-    }).catch( function (error) {
-      if (error.response) {
-        // Request made and server responded
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
-      } else if (error.request) {
-        // The request was made but no response was received
-        console.log(error.request);
-      } else {
-        // Something happened in setting up the request that triggered an error
-        console.log('Error', error.message);
-      }
-    })
+    request('/app', {'text': setText}, { count: count })
     count++;
   }
 
+  function openVerifyTab() {
+    if (redirecturl != null) {
+      window.open(redirecturl, '_blank')
+    }
+    if (waitForCode == null) { // one login at a time
+      setWaitForCode(interval(() => {
+        request('/app/verify', {'code': setAuthCode}, { id: sessionid })
+      }, 1500, 10))
+    }
+  }
+
+  function handleShowListening() {
+    if (authCode != null && authCode != 'none') {
+      request('/app/data', {'listening': setLt_listening}, { id: sessionid })
+    }
+  }
+
+  // - Styling -
+
+  const fullscreen = {width:"100%", height:"100%", position:"absolute", top:0, left:0, right:0, bottom:0}
+
+  // - App View -
+
   return (
-    <Container>
-      <div>
+    <Container> 
+      <Fade in={visible} style={Object.assign({}, {transition:"opacity .35s linear", backgroundColor:"white", zIndex:fadeDepth}, fullscreen)}>
+        <p></p>
+      </Fade>
+      <Container style={Object.assign({}, {margin:'30px', zIndex:mainDepth}, fullscreen)}>
         <Row>
-          <Col><Button onClick={handleSubmit} variant="primary">button</Button></Col>
-          <Col><p class="text-center">{text}</p></Col>
+          <Col>session identifier: {sessionid}</Col>
         </Row>
-      </div>
+        <Row>
+          <Col>authorization code: {authCode}</Col>
+        </Row>
+        <Row>
+          <Col><Button onClick={handleSubmit} variant="warning">request {text}</Button></Col>
+        </Row>
+        <Row>
+          <Col><Button onClick={openVerifyTab} variant="primary">login</Button></Col>
+        </Row>
+        <Row>
+          <Col><Button onClick={handleShowListening} variant="warning">show lt_listening</Button></Col>
+        </Row>
+        <Row>
+          <Col>{lt_listening}</Col>
+        </Row>
+      </Container>
     </Container>
   )
 }
