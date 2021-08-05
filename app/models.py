@@ -4,7 +4,7 @@ from django.db import models
 
 class StoredSession(models.Model):
 
-   id = models.CharField(max_length = 43, primary_key=True)
+   id = models.CharField(max_length = 32, primary_key=True)
    properties = models.JSONField()
    content = models.JSONField()
    data = models.JSONField()

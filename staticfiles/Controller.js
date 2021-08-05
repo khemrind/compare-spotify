@@ -12,7 +12,12 @@ import React from 'react';
     .then(response => {
       var payload = response.data
       for (let key in assignment) {
-        assignment[key](payload[key])
+        try {
+          assignment[key](payload[key])
+        } catch (error) {
+          console.log('Assignment error:')
+          console.log(error)
+        }
       }
       console.log(payload) // for development only
     }).catch( function (error) {

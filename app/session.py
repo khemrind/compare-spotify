@@ -12,9 +12,11 @@ class Session:
     def __init__(self, loading = False):
 
         if not loading:
-            url, state = auth.user_get_auth()
-            self.id = state
-            self.data['authurl'] = url
+            self.id = tool.produce_uuid()
+            self.data['stateA'] = 'A' + self.id
+            self.data['stateF'] = 'F' + self.id
+            self.data['urlA'] = auth.user_get_url(self.data['stateA'])
+            self.data['urlF'] = auth.user_get_url(self.data['stateF'])
             self.save()
 
     def save(self):
@@ -36,7 +38,7 @@ class Session:
         return StoredSession.objects.filter(id = self.id).first()
 
     def __str__(self):
-        return '<Session:' + self.id + '>'
+        return '<Session: ' + self.id + '>'
 
     @classmethod
     def load(cls, identifier: str):
