@@ -7,8 +7,8 @@ def getUser(client: Spotify):
 
 def getListeningComparison(clientA: Spotify, clientF: Spotify):
 
-    listeningA = clientA.current_user_top_tracks('long_term', limit=10).items
-    listeningF = clientF.current_user_top_tracks('long_term', limit=10).items
+    listeningA = clientA.current_user_top_tracks('long_term', limit=25).items
+    listeningF = clientF.current_user_top_tracks('long_term', limit=25).items
 
     popA = 0
     popF = 0
