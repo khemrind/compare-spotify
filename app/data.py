@@ -62,6 +62,6 @@ def getListeningComparison(clientA: Spotify, clientF: Spotify):
     average = (average / len(minTable)) * 100
 
     scale = math.sqrt(2)
-    similarity = 100 - (average / scale)
+    similarity = round(100 - (average / scale), 2)
 
     return (similarity, popA, popF)
