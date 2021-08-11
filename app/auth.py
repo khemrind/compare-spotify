@@ -5,8 +5,8 @@ from app import tool
 
 client_id = 'd1c0609dade3434197f56752749768b5'
 client_secret = 'e8bdeaf95b63422e8578c0f3847d1583'
-# redirect_uri = 'https://compare-spotify.herokuapp.com/app/session' 
-redirect_uri = 'http://127.0.0.1:8000/app/session'
+redirect_uri = 'https://compare-spotify.herokuapp.com/app/session' 
+# redirect_uri = 'http://127.0.0.1:8000/app/session'
 
 import tekore as core
 scope = [
