@@ -1,11 +1,12 @@
 from tekore._auth.refreshing import RefreshingCredentials
-from tekore._auth.refreshing import RefreshingToken
-from tekore._auth.util import UserAuth
+from tekore._auth.scope import Scope
+from urllib.parse import urlencode
+from app import tool
 
 client_id = 'd1c0609dade3434197f56752749768b5'
 client_secret = 'e8bdeaf95b63422e8578c0f3847d1583'
-redirect_uri = 'https://compare-spotify.herokuapp.com/app/session' 
-# redirect_uri = 'http://127.0.0.1:8000/app/session'
+# redirect_uri = 'https://compare-spotify.herokuapp.com/app/session' 
+redirect_uri = 'http://127.0.0.1:8000/app/session'
 
 import tekore as core
 scope = [
@@ -21,9 +22,16 @@ def app_verify():
     app_token = core.request_client_token(client_id, client_secret)
     return core.Spotify(app_token)
 
-def user_get_url(state: str):
-    cred = RefreshingCredentials(client_id, client_secret, redirect_uri)
-    return cred.user_authorisation_url(scope, state, show_dialog=True)
+def user_get_url(statePayload: dict):
+    payload = {
+        'client_id': client_id,
+        'redirect_uri': redirect_uri,
+        'response_type': 'code',
+        'scope': str(Scope(*scope)),
+        'show_dialog': 'true'
+    }
+    payload['state'] = tool.state_encode(statePayload)
+    return 'https://accounts.spotify.com/authorize' + '?' + urlencode(payload)
 
 def user_verify(code: str):
     cred = RefreshingCredentials(client_id, client_secret, redirect_uri)
@@ -36,5 +44,6 @@ def verify_prompt():
         client_secret=client_secret, 
         redirect_uri=redirect_uri, 
         scope=scope)
+    print(token)
     spotify.token = token
     return spotify

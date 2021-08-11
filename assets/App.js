@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { request, interval } from './Controller';
+import Access, { request, process } from './Server';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Fade from 'react-bootstrap/Fade'
+import Card from 'react-bootstrap/Card'
+import ListGroup from 'react-bootstrap/ListGroup';
+import Collapse from 'react-bootstrap/Collapse';
+const { v4: uuidv4 } = require('uuid');
+const sessionID = uuidv4();
 
 function App() {
 
@@ -13,18 +18,12 @@ function App() {
   // onsite
   const [loading, setLoading] = useState(true);
   const [visible, setVisible] = useState(true);
-  const [session, setSession] = useState(null);
-  const [stateA, setStateA] = useState(null);
-  const [stateF, setStateF] = useState(null);
-  const [usernameA, setUsernameA] = useState(null);
-  const [usernameF, setUsernameF] = useState(null);
-  const [similarity, setSimilarity] = useState(null);
-  const [popularityA, setPopularityA] = useState(null);
-  const [popularityF, setPopularityF] = useState(null);
-  const [compareActive, setCompareActive] = useState('disabled');
+  const usernameA = Access(sessionID, '/app/data', 'A.username');
+  const usernameF = Access(sessionID, '/app/data', 'F.username');
+  const similarity = Access(sessionID, '/app/data', 'similarity');
+  const similarArtists = Access(sessionID, '/app/data', 'similarArtists');
+  const [loggedIn, setLoggedIn] = useState(false);
   // offsite
-  const [getUserA, setGetUserA] = useState(null);
-  const [getUserF, setGetUserF] = useState(null);
   const [urlA, setUrlA] = useState(null);
   const [urlF, setUrlF] = useState(null);
 
@@ -32,13 +31,10 @@ function App() {
 
   useEffect(() => {
     // session
-    request('/app',{ 
-      'session': setSession,
-      'stateA': setStateA,
-      'stateF': setStateF,
-      'urlA': setUrlA,
-      'urlF': setUrlF,
-    }, {})
+    request('/app', { 
+      'A.url': setUrlA,
+      'F.url': setUrlF,
+    }, {'session': sessionID})
     // loading fade
     setTimeout(() => { 
       setLoading(false) 
@@ -51,21 +47,10 @@ function App() {
   // - Rendering -
 
   useEffect(() => {
-    console.log('render')
-    // logging in A
-    if ((usernameA != null && usernameA != 'none') && getUserA != null) {
-      clearInterval(getUserA)
-      setGetUserA(null) // able to log in again
-    }
-    // logging in F
-    if ((usernameF != null && usernameF != 'none') && getUserF != null) {
-      clearInterval(getUserF)
-      setGetUserF(null)
-    }
-    if ((usernameA != null && usernameA != 'none') &&
-        (usernameF != null && usernameF != 'none')) {
-      setCompareActive('')
-    }
+    // compare btn
+    if (usernameA.value != null && usernameF.value != null) {
+      setLoggedIn(true)
+    } else { setLoggedIn(false) }
   });
 
   // - Input Actions -
@@ -74,31 +59,27 @@ function App() {
     if (urlA != null) {
       window.open(urlA, '_blank')
     }
-    if (getUserA == null) { // log in once at a time
-      setGetUserA(interval(() => {
-        request('/app/user', {'user': setUsernameA}, { session: session, state: stateA })
-      }, 1500, 10))
-    }
+    usernameA.load()
   }
 
   function loginF() {
     if (urlF != null) {
       window.open(urlF, '_blank')
     }
-    if (getUserF == null) {
-      setGetUserF(interval(() => {
-        request('/app/user', {'user': setUsernameF}, { session: session, state: stateF })
-      }, 1500, 10))
+    usernameF.load()
+  }
+
+  function getComparison() {
+    if (loggedIn) {
+      process('compare', [sessionID])
+      similarity.load()
     }
   }
 
-  function compare() {
-    if ((usernameA != null && usernameA != 'none') &&
-        (usernameF != null && usernameF != 'none')) {
-      request('/app/compare', 
-      {'similarity': setSimilarity, 'popularityA': setPopularityA, 'popularityF': setPopularityF},
-      {session: session}
-      )
+  function getSimilarArtists() {
+    if (loggedIn) {
+      process('similar_artists', [sessionID])
+      similarArtists.load()
     }
   }
 
@@ -110,28 +91,46 @@ function App() {
         <Fade in={loading} className='position-fixed' style={{transition:"opacity .35s linear", backgroundColor:"white", zIndex: 1}}>
           <p className='vw-100 vh-100'></p></Fade>
       } <Col className='p-3'>
-      <Row><h4 className="square bg-light rounded text-muted mb-2 p-3">Session Identifier: {session}</h4></Row>
-      <Row>
-        <Col className='col-auto'>
-        <p className="square bg-light rounded text-muted mb-2 p-2">
+      <Row className="mb-2"><h4 className="square bg-light rounded text-muted p-3">Session Identifier: {sessionID}</h4></Row>
+      <Row className="mb-2">
+        <Col className='col-auto p-0 me-2'>
+        <p className="square bg-light rounded text-muted m-0 p-2">
           <Button onClick={loginA}>authenticate 1st user</Button>
-          <em className="m-2">User: {usernameA}</em>
+          <em className="m-2">User: {usernameA.loading ? 'authenticating..': usernameA.value}</em>
+        </p></Col>
+        <Col className='col-auto p-0'>
+        <p className="square bg-light rounded text-muted m-0 p-2">
+          <Button onClick={loginF}>authenticate 2nd user</Button>
+          <em className="m-2">User: {usernameF.loading ? 'authenticating..': usernameF.value}</em>
         </p></Col>
       </Row>
+      <Row className="mb-2"><Col className='col-auto p-0'>
+        <p className="square bg-light rounded text-muted p-2">
+            <Button disabled={!loggedIn} style={{zIndex: 0}} onClick={getComparison} variant='warning'>compare</Button>
+            <em className="m-2">Similarity: {similarity.loading ? 'loading..': similarity.value}%</em>
+        </p>
+      </Col></Row>
+
       <Row>
         <Col className='col-auto'>
-        <p className="square bg-light rounded text-muted mb-2 p-2">
-          <Button onClick={loginF}>authenticate 2nd user</Button>
-          <em className="m-2">User: {usernameF}</em>
-        </p></Col>
+        <Card>
+          <Card.Header className="text-center">
+            <Button disabled={!loggedIn} style={{zIndex: 0}} onClick={getSimilarArtists} variant='info'>
+              {similarArtists.loading ? 'loading..': 'similar artists'}</Button></Card.Header>
+          <Collapse in={similarArtists.value != null}>
+            <ListGroup variant="flush">
+              {similarArtists.value != null && similarArtists.value.map(item => 
+              <ListGroup.Item>{item}</ListGroup.Item>
+              )}
+            </ListGroup>
+          </Collapse>
+          <Card.Footer className="text-center text-muted">
+            <em>{similarArtists.value != null && similarArtists.value.length} artists</em>
+            </Card.Footer>
+        </Card>
+        </Col>
       </Row>
-      <Row>
-      <Col className='col-auto'>
-      <p className="square bg-light rounded text-muted mb-2 p-2">
-          <Button className={'' + compareActive} style={{zIndex: 0}} onClick={compare} variant='warning'>compare</Button>
-          <em className="m-2">Similarity: {similarity}% | 1st Popularity: {popularityA} | 2nd Popularity: {popularityF}</em>
-        </p></Col>
-      </Row>
+
       </Col></Container>
   )
 }

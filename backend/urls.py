@@ -19,7 +19,6 @@ from django.views.generic import TemplateView
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.views.generic.base import RedirectView
 
-
 urlpatterns = [
     path('admin/', admin.site.urls), # admin 
     path('', TemplateView.as_view(template_name='frontend/index.html')), # landing template

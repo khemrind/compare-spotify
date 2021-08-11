@@ -1,72 +1,67 @@
+from app.session import Session
 from django.http import JsonResponse
 from django.http import HttpRequest
 from django.shortcuts import render
-from app import auth
-from app import data
+from app.process import handler
+from app import auth, tool
 
 def index(request: HttpRequest): 
     ## get session keys
-    session = Session()
+    sessionID = request.GET.get('session')
+    session = Session(sessionID)
+    handler.initialize(sessionID)
     response = {
-        'session': session.id,
-        'stateA': session.data['stateA'],
-        'stateF': session.data['stateF'],
-        'urlA': session.data['urlA'],
-        'urlF': session.data['urlF']}
+        'A.url': session.data['A']['url'],
+        'F.url': session.data['F']['url']}
     return JsonResponse(response)
 
-from app.session import Session
 def session(request: HttpRequest): 
     ## authorize session client
     code = request.GET.get('code')
-    state = request.GET.get('state')
-    session = Session.load(state[1:len(state)]) # omit A, F
-    if state[0] == 'A':
-        session.data['tokenA'] = str(auth.user_verify(code))
-    else:
-        session.data['tokenF'] = str(auth.user_verify(code))
-    session.save()
+    state = tool.state_decode(request.GET.get('state'))
+    sessionID = state.get('session')
+    account = state.get('account')
+    # load session
+    session = handler.read(sessionID)
+    if session != None:
+        # load token
+        process.load_token(sessionID, account, code)
+        # build profile
+        process.load_username(sessionID, account)
+        process.load_listening(sessionID, account)
+        process.load_artists(sessionID, account)
     return render(request, 'frontend/close.html')
 
-def _getClient(sessionID: str, state: str):
-    # attempt session load
-    session = Session.load(sessionID)
+def data(request: HttpRequest):
+    ## get specific session data
+    sessionID = request.GET.get('session')
+    objectPath = request.GET.get('objectPath').split('.')
+    # load session
+    session = handler.read(sessionID)
+    # attempt retrieve data
+    response = { 'data': None }
     if session != None:
+        pointer = session.data
         try:
-            spotify = auth.app_verify()
-            token = None
-            if state[0] == 'A':
-                token = session.data['tokenA']
-            elif state[0] == 'F':
-                token = session.data['tokenF']
-            if token != None:
-                spotify.token = token
-            return spotify
-        except:
-            return None
-
-def user(request: HttpRequest): 
-    ## get client username
-    response = {}
-    sessionID = request.GET.get('session')
-    state = request.GET.get('state')
-    client = _getClient(sessionID, state)
-    if client != None:
-        response = {'user': data.getUser(client)}
-    else: response = {'user': 'none'} # "UNAUTHORIZED" needs formal response flow
+            for node in objectPath:
+                pointer = pointer[node]
+            response = { 'data': pointer }
+        except: pass
     return JsonResponse(response)
 
-def compare(request: HttpRequest): 
-    # get comparison data
-    response = {}
-    sessionID = request.GET.get('session')
-    session = Session.load(sessionID)
-    if session != None:
-        clientA = auth.app_verify()
-        clientF = auth.app_verify()
-        clientA.token = session.data['tokenA']
-        clientF.token = session.data['tokenF']
-        (similarity, popularityA, popularityF) = data.getListeningComparison(clientA, clientF)
-        response = {'similarity': similarity, 'popularityA': popularityA, 'popularityF': popularityF}
-    # NO ELSE: empty response may cause FrontEnd Controller assignment error !watch!
-    return JsonResponse(response)
+def func(request: HttpRequest):
+    ## start specific data process
+    function = request.GET.get('function')
+    arguments = request.GET.getlist('args[]')
+    getFunctions()[function](*arguments)
+    return JsonResponse({})
+
+from inspect import getmembers
+from app import process
+def getFunctions():
+    ## get process functions
+    table = {}
+    for member in getmembers(process):
+        table[member[0]] = member[1]
+
+    return table
