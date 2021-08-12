@@ -58,6 +58,7 @@ class Handler:
         return commit
 
     def read(self, identifier) -> Session:
+        print('read session: ' + identifier)
         executed = False
         session = None
         def read_request():
@@ -65,7 +66,9 @@ class Handler:
             nonlocal session
             session = Session.load(identifier)
             executed = True
+            print('read session executed')
         for group in self.queue:
+            print(group.id)
             if group.id == identifier:
                 group.put_nowait(Process(read_request))
         while not executed:
