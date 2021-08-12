@@ -73,6 +73,8 @@ class Handler:
         return session
         
     def main(self):
+
+        print('handler thread started.')
         
         while main_thread().is_alive():
 
