@@ -21,15 +21,21 @@ def session(request: HttpRequest):
     state = tool.state_decode(request.GET.get('state'))
     sessionID = state.get('session')
     account = state.get('account')
+    print('loaded request')
     # load session
     session = handler.read(sessionID)
+    print('session read')
     if session != None:
         # load token
         process.load_token(sessionID, account, code)
+        print('token')
         # build profile
         process.load_username(sessionID, account)
+        print('user')
         process.load_listening(sessionID, account)
+        print('listening')
         process.load_artists(sessionID, account)
+        print('artists')
     return render(request, 'frontend/close.html')
 
 def data(request: HttpRequest):
