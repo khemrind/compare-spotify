@@ -90,12 +90,14 @@ class Handler:
                         item = group.get_nowait()
                         item.publish()
                         group.task_done()
+                        print('commit published')
                         time.sleep(0)
                     # some task
                     elif isinstance(item, Process):
                         item = group.get_nowait()
                         item.task()
                         group.task_done()
+                        print('process finished')
                         time.sleep(0)
 
             # idle; let system operate on other threads
